@@ -5,8 +5,9 @@ RUN dnf -y install vim python3-pip \
     && dnf clean all
 RUN mkdir /flask-app
 WORKDIR /flask-app
-COPY . /flask-app
+COPY requirements.txt /flask-app
 RUN pip-3 install --no-cache-dir -r requirements.txt
+COPY . /flask-app
 
 EXPOSE 5000
 

@@ -1,12 +1,14 @@
 import logging
 import sys
 
+from . import metrics
 from flask import Flask
 
 
 # This create_app function creates the master Flask app object
 def create_app():
     app = Flask(__name__)
+    metrics.start_server()
 
     # Register the main API routes
     from api.main import bp as main_bp

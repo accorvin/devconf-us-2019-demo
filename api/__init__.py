@@ -10,7 +10,7 @@ def create_app():
 
     # Register the main API routes
     from api.main import bp as main_bp
-    app.register_blueprint(main_bp, url_prefix='/api')
+    app.register_blueprint(main_bp)
 
     # Enable logging for production
     if not app.debug and not app.testing:

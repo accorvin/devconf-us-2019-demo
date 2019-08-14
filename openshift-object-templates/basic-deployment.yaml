@@ -1,0 +1,94 @@
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dev-conf-demo-app
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: dev-conf-demo-app
+  template:
+    metadata:
+      labels:
+        deploymentconfig: dev-conf-demo-app
+    spec:
+      containers:
+        - name: dev-conf-demo-app
+          resources:
+            limits:
+              memory: "500Mi"
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+            - containerPort: 5000
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /
+              port: 5000
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+          - dev-conf-demo-app
+        from:
+          kind: ImageStreamTag
+          name: dev-conf-demo-app:latest
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dev-conf-demo-app
+spec:
+  ports:
+    - name: 5000-tcp
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    deploymentconfig: dev-conf-demo-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: "true"
+  name: dev-conf-demo-app-metrics
+spec:
+  ports:
+    - name: 8000-tcp
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    deploymentconfig: dev-conf-demo-app
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: dev-conf-demo-app
+spec:
+  to:
+    kind: Service
+    name: dev-conf-demo-app
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: dev-conf-demo-app-metrics
+spec:
+  to:
+    kind: Service
+    name: dev-conf-demo-app-metrics

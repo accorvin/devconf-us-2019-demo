@@ -1,0 +1,28 @@
+apiVersion: opendatahub.io/v1alpha1
+kind: OpenDataHub
+metadata:
+  name: spark-opendatahub
+spec:
+  # JupyterHub deployment developed by Graham Dumpleton - https://github.com/aicoe/jupyterhub-ocp-oauth
+  aicoe-jupyterhub:
+    # Deploy the ODH aicoe-jupyterhub role if True
+    odh_deploy: false
+
+  # Spark operator developed by radanalyticsio - https://github.com/radanalyticsio/spark-operator
+  spark-operator:
+    # Deploy the ODH spark-operator role if True
+    odh_deploy: false
+
+
+  # Seldon Delployment
+  seldon:
+    odh_deploy: false
+
+  # JupyterHub deployment developed by Graham Dumpleton - https://github.com/jupyter-on-openshift/jupyterhub-quickstart
+  jupyter-on-openshift:
+    # Deploy the ODH jupyter-on-openshift role if True
+    odh_deploy: false
+
+  # Deployment of Prometheus and Grafana for Monitoring of ODH
+  monitoring:
+    odh_deploy: true

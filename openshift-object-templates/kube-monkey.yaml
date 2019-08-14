@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-monkey
+
+---
+apiVersion: authorization.openshift.io/v1
+kind: RoleBinding
+metadata:
+  name: "kube-monkey-admin"
+roleRef:
+  name: "admin"
+subjects:
+  - kind: 'ServiceAccount'
+    name: kube-monkey
+
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: kube-monkey
+  labels:
+    app: kube-monkey
+spec:
+  selector:
+    app: kube-monkey
+  replicas: 1
+  strategy:
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        app: kube-monkey
+    spec:
+      serviceAccountName: kube-monkey
+      containers:
+        - name: kube-monkey
+          command:
+            - /kube-monkey
+            - -v=1
+            - -log_dir=/var/log/kube-monkey
+          image: docker.io/ayushsobti/kube-monkey:v0.3.0
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/kube-monkey
+              name: kubeconfigmap
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: kube-monkey-config-map
+          name: kubeconfigmap
+  triggers:
+    - type: ConfigChange
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-monkey-config-map
+data:
+  config.toml: |
+    [kubemonkey]
+    dry_run = false
+    run_hour = 8
+    start_hour = 10
+    end_hour = 16
+    whitelisted_namespaces = ["{{ namespace }}"]
+    time_zone = "America/New_York"
+    [debug]
+    enabled = true
+    schedule_immediate_kill = true
+    force_should_kill = true
+    schedule_delay = 15

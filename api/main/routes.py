@@ -1,9 +1,6 @@
-import queue
 import random
 import socket
 import string
-import threading
-import time
 
 
 from .. import metrics
@@ -32,23 +29,8 @@ def error():
 
 @bp.route('/random')
 def random_route():
-    THREADS = 1
     STRING_LENGTH = 300000000
 
-    def process_queue(q):
-        while True:
-            q.get()
-            time.sleep(1)
-
-    q = queue.Queue(maxsize=0)
-
-    for i in range(THREADS):
-        worker = threading.Thread(target=process_queue, args=(q,))
-        worker.setDaemon(True)
-        worker.start()
-
-    str = ''.join(random.choice(string.ascii_uppercase) for i in range(1)) * \
+    long_str = ''.join(random.choice(string.ascii_uppercase) for i in range(1)) * \
         STRING_LENGTH
-    q.put(str)
-    q.join()
     return jsonify(message='Random load generated')

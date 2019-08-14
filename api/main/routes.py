@@ -1,4 +1,7 @@
 import socket
+import random
+import time
+
 
 from .. import metrics
 
@@ -23,3 +26,16 @@ def error():
     metrics.SITE_ERROR_COUNTER.inc()
     return (jsonify(message='This page generated an error!'),
             status.HTTP_400_BAD_REQUEST)
+
+
+@bp.route('/random')
+def random_route():
+    seconds = 3
+
+    timeout = time.time() + seconds
+    while True:
+        num = random.randint(1, 99999999)
+        if time.time() > timeout:
+            break
+
+    return jsonify(random_number=num)

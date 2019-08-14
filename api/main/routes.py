@@ -1,3 +1,5 @@
+import socket
+
 from .. import metrics
 
 from api.main import bp
@@ -10,8 +12,10 @@ from flask_api import status
 @bp.route('/')
 @bp.route('/index')
 def index():
+    hostname = socket.gethostname()
     metrics.SITE_ACCESSED_COUNTER.inc()
-    return jsonify(response='Hello, World!')
+    return jsonify(response='Hello, World!',
+                   hostname=hostname)
 
 
 @bp.route('/error')

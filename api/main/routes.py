@@ -1,12 +1,12 @@
-import random
 import socket
-import string
-
 
 from .. import metrics
 from api.main import bp
 from flask import jsonify
 from flask_api import status
+
+
+MEMORY_HOG = None
 
 
 # Define a route and the endpoint that it's availalbe at
@@ -27,10 +27,7 @@ def error():
             status.HTTP_400_BAD_REQUEST)
 
 
-@bp.route('/random')
-def random_route():
-    STRING_LENGTH = 300000000
-
-    long_str = ''.join(random.choice(string.ascii_uppercase) for i in range(1)) * \
-        STRING_LENGTH
-    return jsonify(message='Random load generated')
+@bp.route('/load')
+def load():
+    MEMORY_HOG = bytearray(300000000)
+    return jsonify(message='Load generated')

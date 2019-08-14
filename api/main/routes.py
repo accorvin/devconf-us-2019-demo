@@ -1,6 +1,7 @@
 import socket
 
 from .. import metrics
+from .. import load
 from api.main import bp
 from flask import jsonify
 from flask_api import status
@@ -28,6 +29,6 @@ def error():
 
 
 @bp.route('/load')
-def load():
-    MEMORY_HOG = bytearray(300000000)
+def add_load():
+    load.MEMORY_LOAD.append(bytearray(100000000))
     return jsonify(message='Load generated')

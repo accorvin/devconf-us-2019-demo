@@ -1,6 +1,6 @@
 import socket
 import random
-import time
+import threading
 
 
 from .. import metrics
@@ -30,12 +30,16 @@ def error():
 
 @bp.route('/random')
 def random_route():
-    seconds = 3
+    THREADS = 5
+    ROUNDS = 1000000
 
-    timeout = time.time() + seconds
-    while True:
-        num = random.randint(1, 99999999)
-        if time.time() > timeout:
-            break
+    def f():
+        for i in range(ROUNDS):
+            random.randint(0, 999999)
+        return
 
-    return jsonify(random_number=num)
+    for i in range(THREADS):
+        t = threading.Thread(target=f)
+        t.start()
+
+    return jsonify(message='Load generated')

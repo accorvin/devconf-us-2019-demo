@@ -1,10 +1,12 @@
-import socket
+import queue
 import random
+import socket
+import string
 import threading
+import time
 
 
 from .. import metrics
-
 from api.main import bp
 from flask import jsonify
 from flask_api import status
@@ -30,16 +32,23 @@ def error():
 
 @bp.route('/random')
 def random_route():
-    THREADS = 5
-    ROUNDS = 1000000
+    THREADS = 1
+    STRING_LENGTH = 300000000
 
-    def f():
-        for i in range(ROUNDS):
-            random.randint(0, 999999)
-        return
+    def process_queue(q):
+        while True:
+            q.get()
+            time.sleep(1)
+
+    q = queue.Queue(maxsize=0)
 
     for i in range(THREADS):
-        t = threading.Thread(target=f)
-        t.start()
+        worker = threading.Thread(target=process_queue, args=(q,))
+        worker.setDaemon(True)
+        worker.start()
 
-    return jsonify(message='Load generated')
+    str = ''.join(random.choice(string.ascii_uppercase) for i in range(1)) * \
+        STRING_LENGTH
+    q.put(str)
+    q.join()
+    return jsonify(message='Random load generated')

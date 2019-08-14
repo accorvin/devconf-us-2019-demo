@@ -9,3 +9,8 @@ SITE_ACCESSED_COUNTER = Counter(
     'demo_site_accessed',
     'A count of the number of times the site has been accessed'
 )
+
+SITE_ERROR_COUNTER = Counter(
+    'demo_site_errors',
+    'A count of the number of page errors'
+)
